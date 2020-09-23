@@ -23,6 +23,29 @@ const froggy = {
     }
 }
 
+const controller = {
+    left: false,
+    right: false,
+    up: false,
+    down: false,
+
+    isMoving (e) {
+        let keyStatus = (e.type == 'keydown') ? true : false;
+        let key = e.keyCode;
+        switch (key) {
+            case 37:
+                controller.left = keyStatus;
+                break;
+            case 38:
+                controller.up = keyStatus;
+                break;
+            case 39:
+                controller.right = keyStatus;
+                break;
+        }
+    }
+}
+
 const drawBg = () => {
     ctx.fillStyle = "#008511";
     ctx.fillRect(0, 0, width, SIZE*2);
