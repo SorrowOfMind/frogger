@@ -9,9 +9,18 @@ const SIZE = 20;
 const froggy = {
     width: SIZE,
     height: SIZE,
-    x: width*0.5 - this.width,
-    y: height - this.height,
+    x: width*0.5 - SIZE,
+    y: height - SIZE,
+    velX: 0,
+    velY: 0,
+    speed: 5,
 
+    draw() {
+        ctx.fillStyle = '#2ADE18';
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.width, this.height);
+        ctx.fill();
+    }
 }
 
 const drawBg = () => {
@@ -39,22 +48,18 @@ const drawBg = () => {
 const drawLanes = () => {
     ctx.strokeStyle = "white";
     ctx.beginPath();
-    
     for (let i = 0; i < 10; i++) {
-        let x = i*SIZE;
         let y = SIZE*16+i*22;
         ctx.moveTo(0, y);
-        // ctx.lineTo(x+10, SIZE*16);
-        // ctx.stroke();
         for (let j = 0; j < 30; j++) {
             ctx.moveTo(j*SIZE, y);
             ctx.lineTo(j*SIZE+10, y);
             ctx.stroke();
         }
-
     }
     ctx.stroke();
 }
 
 drawBg();
 drawLanes();
+froggy.draw();
