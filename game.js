@@ -13,13 +13,34 @@ const froggy = {
     y: height - SIZE,
     velX: 0,
     velY: 0,
-    speed: 5,
+    speed: 10,
 
     draw() {
         ctx.fillStyle = '#2ADE18';
         ctx.beginPath();
         ctx.rect(this.x, this.y, this.width, this.height);
         ctx.fill();
+    },
+
+    move() {
+        if (controller.right) {
+            this.velX = this.speed;
+            this.x += this.velX;
+        }
+        if (controller.left) {
+            this.velX = - this.speed;
+            this.x += this.velX;
+        }
+        if (controller.up) {
+            this.velY = - this.speed;
+            this.y += this.velY;
+        }
+    },
+
+    detectBorderCollision() {
+        if (this.x <= 0) this.x = 0;
+        if (this.x + this.width >= width) this.x = width - this.width;
+        if (this.y <= 0) this.y = 0;
     }
 }
 
@@ -83,6 +104,16 @@ const drawLanes = () => {
     ctx.stroke();
 }
 
-drawBg();
-drawLanes();
-froggy.draw();
+function gameLoop() {
+    drawBg();
+    drawLanes();
+    froggy.draw();
+    froggy.move();
+    froggy.detectBorderCollision();
+
+    requestAnimationFrame(gameLoop);
+}
+
+requestAnimationFrame(gameLoop);
+window.addEventListener('keydown', controller.isMoving);
+window.addEventListener('keyup', controller.isMoving);
