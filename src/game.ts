@@ -1,4 +1,4 @@
-import {IbaseVars, IdrawObj, IPlayer, IController, ICar} from './models/interfaces.js';
+import {IbaseVars, IdrawObj, IPlayer, IController, IManager} from './models/interfaces.js';
 
 function main(): void {
     
@@ -41,7 +41,7 @@ function main(): void {
                     //     baseVars.ctx.lineTo(j * baseVars.size + 10, y);
                     //     baseVars.ctx.stroke();
                     // }
-                let y = (16 * baseVars.size + baseVars.size) + (baseVars.size * 2 * i);
+                let y = (17 * baseVars.size) + (baseVars.size * 2 * i);
                 baseVars.ctx.moveTo(0, y);
                 baseVars.ctx.lineTo(baseVars.screenW, y);
                 baseVars.ctx.stroke();
@@ -50,17 +50,45 @@ function main(): void {
         }
     }
 
-    class Cars implements ICar {
-        constructor(private color: string, private x: number, private y: number, private speed: number) {}
+    const car = {
+        color: 'blue',
+        x: baseVars.screenW,
+        y: 0,
+        w: baseVars.size,
+        h: baseVars.size,
+        speed: 0,
+        draw: function () {
+            baseVars.ctx.fillStyle = this.color;
+            baseVars.ctx.beginPath();
+            baseVars.ctx.rect(this.x, this.y, baseVars.size, baseVars.size);
+            baseVars.ctx.fill();
+        },
+        move: function() {
+            this.x -= this.speed;
+        },
+        detectBorderCollision: function () {
+            if (this.x + this.w <= 0) {
+                objectManager.carsGarbage.push(this);
+                objectManager.carsPool = objectManager.carsPool.filter(car => car.x !== this.x && car.y !== this.y);
+            }
+        }
     }
 
-    const objectsPool = {
-        cars: [],
-        logs: []
-    }
-
-    function manageCars() {
-        
+    const objectManager: IManager = {
+        carsPool : [],
+        carsGarbage: [],
+        logsPool: [],
+        carsY: [380, 420],
+        createCar: function() {
+            if (this.carsGarbage.length) {
+                let usedCar: any = this.carsGarbage.shift();
+                usedCar.x = baseVars.screenW;
+                this.carsPool.push(usedCar);
+            } else {
+                let newCar = Object.create(car, {y: {value: this.carsY[0]}, speed: {value: 1}});
+                this.carsPool.push(newCar);
+            }
+        }
     }
 
     class Player implements IPlayer {
@@ -127,12 +155,25 @@ function main(): void {
         }
     }
 
+    objectManager.createCar();
+
     function gameLoop() {
         drawObj.drawBg();
         drawObj.drawLanes();
         froggy.draw();
         froggy.move();
         froggy.detectBorderCollision();
+
+        if (objectManager.carsPool.length) {
+            for (let i = 0; i < objectManager.carsPool.length; i++) {
+                let customCar = objectManager.carsPool[i];
+                customCar.draw();
+                customCar.move();
+                customCar.detectBorderCollision();
+            }
+        }
+       
+        // console.log('pool: ', objectManager.carsPool, 'garbage: ', objectManager.carsGarbage);
 
         requestAnimationFrame(gameLoop);
      }

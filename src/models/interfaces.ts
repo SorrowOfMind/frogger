@@ -23,9 +23,20 @@ export interface IController {
     isMoving(e: KeyboardEvent):void;
 }
 
-export interface ICars {
-    color: string;
-    x: number,
-    y: number,
-    speed: number;
+export interface ICar {
+    color: string, 
+    x: number, 
+    y: number, 
+    speed: number,
+    draw(): void,
+    move(): void,
+    detectBorderCollision(): void
+}
+
+export interface IManager {
+    carsPool: ICar[];
+    carsGarbage: ICar[];
+    logsPool: any[];
+    carsY: number[];
+    createCar(): void;
 }
