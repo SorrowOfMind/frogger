@@ -20,5 +20,12 @@ export interface IController {
     right: boolean;
     up: boolean;
     down: boolean;
-    isMoving(e: Event):void;
+    isMoving(e: KeyboardEvent):void;
+}
+
+export interface ICars {
+    color: string;
+    x: number,
+    y: number,
+    speed: number;
 }

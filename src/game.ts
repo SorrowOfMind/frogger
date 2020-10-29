@@ -1,6 +1,7 @@
-import {IbaseVars, IdrawObj, IPlayer, IController} from './models/interfaces.js';
+import {IbaseVars, IdrawObj, IPlayer, IController, ICar} from './models/interfaces.js';
 
 function main(): void {
+    
     const baseVars: IbaseVars = {
         ctx: document.querySelector('canvas')!.getContext('2d')!,
         get screenW() {return this.ctx.canvas.width;},
@@ -49,6 +50,19 @@ function main(): void {
         }
     }
 
+    class Cars implements ICar {
+        constructor(private color: string, private x: number, private y: number, private speed: number) {}
+    }
+
+    const objectsPool = {
+        cars: [],
+        logs: []
+    }
+
+    function manageCars() {
+        
+    }
+
     class Player implements IPlayer {
         readonly color: string = '#2ADE18'
         constructor(private x: number, private y: number, private w: number, private h: number, private velX: number, private velY: number, private speed: number) {}
@@ -60,7 +74,6 @@ function main(): void {
         }
         move() {
             if (controller.right) {
-                console.log('I am moving!');
                 this.velX = this.speed;
                 this.x += this.velX;
             }
@@ -76,6 +89,13 @@ function main(): void {
                 this.velY = this.speed;
                 this.y += this.velY;
             }
+        }
+
+        detectBorderCollision() {
+            if (this.x <= 0) this.x = 0;
+            if (this.x + this.w >= baseVars.screenW) this.x = baseVars.screenW - this.w;
+            if (this.y <= 0) this.y = 0;
+            if (this.y + this.h >= baseVars.screenH) this.y = baseVars.screenH - this.h;
         }
     }
 
@@ -112,6 +132,7 @@ function main(): void {
         drawObj.drawLanes();
         froggy.draw();
         froggy.move();
+        froggy.detectBorderCollision();
 
         requestAnimationFrame(gameLoop);
      }

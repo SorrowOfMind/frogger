@@ -44,6 +44,20 @@ function main() {
             }
         }
     };
+    class Cars {
+        constructor(color, x, y, speed) {
+            this.color = color;
+            this.x = x;
+            this.y = y;
+            this.speed = speed;
+        }
+    }
+    const objectsPool = {
+        cars: [],
+        logs: []
+    };
+    function manageCars() {
+    }
     class Player {
         constructor(x, y, w, h, velX, velY, speed) {
             this.x = x;
@@ -63,7 +77,6 @@ function main() {
         }
         move() {
             if (controller.right) {
-                console.log('I am moving!');
                 this.velX = this.speed;
                 this.x += this.velX;
             }
@@ -79,6 +92,16 @@ function main() {
                 this.velY = this.speed;
                 this.y += this.velY;
             }
+        }
+        detectBorderCollision() {
+            if (this.x <= 0)
+                this.x = 0;
+            if (this.x + this.w >= baseVars.screenW)
+                this.x = baseVars.screenW - this.w;
+            if (this.y <= 0)
+                this.y = 0;
+            if (this.y + this.h >= baseVars.screenH)
+                this.y = baseVars.screenH - this.h;
         }
     }
     let froggy = new Player(baseVars.screenW * 0.5 - baseVars.size, baseVars.screenH - baseVars.size, baseVars.size, baseVars.size, 0, 0, 2);
@@ -111,6 +134,7 @@ function main() {
         drawObj.drawLanes();
         froggy.draw();
         froggy.move();
+        froggy.detectBorderCollision();
         requestAnimationFrame(gameLoop);
     }
     requestAnimationFrame(gameLoop);
