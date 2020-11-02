@@ -1,4 +1,5 @@
-import {IbaseVars, IdrawObj, IPlayer, IController, IManager} from './models/interfaces.js';
+import {IbaseVars, IdrawObj, IPlayer, IController, IManager, ICar} from './models/interfaces.js';
+import {random} from './utils/functions.js';
 
 function main(): void {
     
@@ -6,7 +7,7 @@ function main(): void {
         ctx: document.querySelector('canvas')!.getContext('2d')!,
         get screenW() {return this.ctx.canvas.width;},
         get screenH() {return this.ctx.canvas.height;},
-        size: 20
+        size: 20,
     }
 
     const drawObj: IdrawObj = {
@@ -34,13 +35,6 @@ function main(): void {
             baseVars.ctx.strokeStyle = "#fff";
             baseVars.ctx.beginPath();
             for (let i = 0; i < 5; i++) {
-                    // let y = baseVars.size * 16 + i * 22;
-                    // baseVars.ctx.moveTo(0, y);
-                    // for (let j = 0; j < 30; j++) {
-                    //     baseVars.ctx.moveTo(j * baseVars.size, y);
-                    //     baseVars.ctx.lineTo(j * baseVars.size + 10, y);
-                    //     baseVars.ctx.stroke();
-                    // }
                 let y = (17 * baseVars.size) + (baseVars.size * 2 * i);
                 baseVars.ctx.moveTo(0, y);
                 baseVars.ctx.lineTo(baseVars.screenW, y);
@@ -50,9 +44,9 @@ function main(): void {
         }
     }
 
-    const car = {
-        color: 'blue',
-        x: baseVars.screenW,
+    const car: ICar = {
+        color: 'red',
+        x: 0,
         y: 0,
         w: baseVars.size,
         h: baseVars.size,
@@ -69,7 +63,7 @@ function main(): void {
         detectBorderCollision: function () {
             if (this.x + this.w <= 0) {
                 objectManager.carsGarbage.push(this);
-                objectManager.carsPool = objectManager.carsPool.filter(car => car.x !== this.x && car.y !== this.y);
+                objectManager.carsPool = objectManager.carsPool.filter(car => car !== this);
             }
         }
     }
@@ -78,14 +72,16 @@ function main(): void {
         carsPool : [],
         carsGarbage: [],
         logsPool: [],
-        carsY: [380, 420],
-        createCar: function() {
+        carsY: [310, 350, 390, 430, 470, 510],
+        createCar: function(carY) {
             if (this.carsGarbage.length) {
                 let usedCar: any = this.carsGarbage.shift();
                 usedCar.x = baseVars.screenW;
                 this.carsPool.push(usedCar);
             } else {
-                let newCar = Object.create(car, {y: {value: this.carsY[0]}, speed: {value: 1}});
+                let randomSpeed = random(3, 5);
+                let randomX = random(baseVars.screenW, baseVars.screenW + 40);
+                let newCar = Object.create(car, {y: {value: carY}, speed: {value: randomSpeed, writable: true}, x: {value: randomX, writable: true}});
                 this.carsPool.push(newCar);
             }
         }
@@ -155,14 +151,22 @@ function main(): void {
         }
     }
 
-    objectManager.createCar();
+    function populateCars() {
+        for (let i = 0; i < objectManager.carsY.length; i++) {
+            let y = objectManager.carsY[i];
+            objectManager.createCar(y);
+            console.log(objectManager.carsPool);
+        }
+    }
+
+    populateCars();
 
     function gameLoop() {
         drawObj.drawBg();
         drawObj.drawLanes();
         froggy.draw();
         froggy.move();
-        froggy.detectBorderCollision();
+        froggy.detectBorderCollision();  
 
         if (objectManager.carsPool.length) {
             for (let i = 0; i < objectManager.carsPool.length; i++) {
@@ -170,11 +174,14 @@ function main(): void {
                 customCar.draw();
                 customCar.move();
                 customCar.detectBorderCollision();
+                if (objectManager.carsGarbage.length) {
+                    objectManager.createCar(customCar.y);
+                }
             }
         }
-       
+        
         // console.log('pool: ', objectManager.carsPool, 'garbage: ', objectManager.carsGarbage);
-
+       
         requestAnimationFrame(gameLoop);
      }
 
