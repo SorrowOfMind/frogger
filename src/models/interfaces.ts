@@ -24,13 +24,15 @@ export interface IController {
 }
 
 export interface ICar {
-    color: string, 
-    x: number, 
-    y: number, 
-    speed: number,
-    draw(): void,
-    move(): void,
-    detectBorderCollision(): void
+    color: string; 
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    speed: number;
+    draw(): void;
+    move(): void;
+    detectBorderCollision(): void;
 }
 
 export interface IManager {
@@ -38,5 +40,5 @@ export interface IManager {
     carsGarbage: ICar[];
     logsPool: any[];
     carsY: number[];
-    createCar(): void;
+    createCar(y: number): void;
 }
