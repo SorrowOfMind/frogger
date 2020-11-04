@@ -3,6 +3,7 @@ export interface IbaseVars {
     screenW: number;
     screenH: number;
     size: number;
+    gameOver: boolean;
 }
 
 export interface IdrawObj {
@@ -13,6 +14,8 @@ export interface IdrawObj {
 export interface IPlayer {
     draw(): void;
     move(): void;
+    detectBorderCollision(): void;
+    detectCarCollision(x: number, y: number, w:number, h: number): void;
 }
 
 export interface IController {
