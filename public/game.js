@@ -5,6 +5,7 @@ function main() {
         get screenW() { return this.ctx.canvas.width; },
         get screenH() { return this.ctx.canvas.height; },
         size: 20,
+        gameOver: false
     };
     const drawObj = {
         drawBg() {
@@ -125,6 +126,20 @@ function main() {
             if (this.y + this.h >= baseVars.screenH)
                 this.y = baseVars.screenH - this.h;
         }
+        detectCarCollision(carX, carY, carW, carH) {
+            const frogTop = this.y;
+            const frogBottom = this.y + this.h;
+            const frogRight = this.x + this.w;
+            const frogLeft = this.x;
+            const carTop = carY;
+            const carBottom = carY + carH;
+            const carRight = carX + carW;
+            const carLeft = carX;
+            if ((frogRight > carLeft && frogLeft < carRight) && ((frogTop > carTop && frogTop < carBottom) || (frogBottom > carTop && frogBottom < carBottom))) {
+                // console.log('frogRight: ', frogRight, 'frogLeft: ', frogLeft, 'carLeft: ', carLeft, 'frogTop: ',frogTop, 'frogBottom: ', frogBottom, 'carTop: ', carTop, 'carBottom: ', carBottom);
+                baseVars.gameOver = true;
+            }
+        }
     }
     let froggy = new Player(baseVars.screenW * 0.5 - baseVars.size, baseVars.screenH - baseVars.size, baseVars.size, baseVars.size, 0, 0, 2);
     const controller = {
@@ -171,15 +186,19 @@ function main() {
                 customCar.draw();
                 customCar.move();
                 customCar.detectBorderCollision();
+                froggy.detectCarCollision(customCar.x, customCar.y, customCar.w, customCar.h);
                 if (objectManager.carsGarbage.length) {
                     objectManager.createCar(customCar.y);
                 }
             }
         }
         // console.log('pool: ', objectManager.carsPool, 'garbage: ', objectManager.carsGarbage);
-        requestAnimationFrame(gameLoop);
+        let loop = window.requestAnimationFrame(gameLoop);
+        if (baseVars.gameOver) {
+            cancelAnimationFrame(loop);
+        }
     }
-    requestAnimationFrame(gameLoop);
+    window.requestAnimationFrame(gameLoop);
     window.addEventListener('keydown', controller.isMoving);
     window.addEventListener('keyup', controller.isMoving);
 }
